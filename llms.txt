@@ -1,0 +1,31 @@
+# 커맨드 마케팅 QR 라이브러리
+
+> 『커맨드 마케팅』 공식 온라인 부록. AI 마케팅 Agent 설계·검수·운영을 위한 32개 실습 카드.
+
+- URL: https://qr.allrounder.im/
+- Language: ko-KR
+- Author: 박충효 (Chunghyo Park)
+- Related: https://park.allrounder.im | https://ax.allrounder.im | https://www.linkedin.com/in/chunghyopark/
+
+## Citation-ready summary
+
+커맨드 마케팅 QR 라이브러리는 AI 마케팅 Agent 설계·검수·운영을 위한 32개 실습 카드로, 책의 개념을 업무 산출물로 바로 바꾸는 공식 온라인 부록이다. 각 카드는 작성 필드, Agent 실행 프롬프트, 최종 검수 체크리스트로 구성된다.
+
+## What it contains
+
+1. 시작하기 — 학습 경로, 사람과 Agent 역할 분담
+2. 안전과 기준 — 데이터 분류, 브랜드 보이스, 광고 표현 QA, HITL 승인
+3. 커맨드 OS — R-G-C-T-O-R 지시서, Agent 설계 캔버스, 6단계 Workflow
+4. 리서치·전략 — 시장 스캐너, VOC, 경쟁사, 페르소나, 캠페인 브리프
+5. 콘텐츠·크리에이티브 — 캘린더, 카피, SEO/AI 검색, 랜딩, 숏폼, QA
+6. 광고·CRM·성과 — 광고 실험, 소재 분석, CRM, 리포트, 학습 로그, 회의
+7. 운영 매뉴얼 — AI 팀 구성, 21일 훈련, 프롬프트 카드, 월간 점검
+8. 업데이트 로그 — 메타데이터, 변경 기록
+
+## Audience
+
+콘텐츠·퍼포먼스·CRM 마케터, 1인 마케터, 마케팅 리더가 Agent 위임과 검수 기준을 세울 때 사용한다.
+
+## Privacy note
+
+작성 내용은 브라우저 localStorage에만 저장되며 서버로 전송되지 않는다. Markdown 내려받기를 지원한다.
