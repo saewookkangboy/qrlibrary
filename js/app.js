@@ -1,5 +1,6 @@
 import {
   buildComposedPrompt,
+  buildTemplatePrompt,
   emptyFieldCount,
   applyExamples,
   nextRelatedId
@@ -16,15 +17,15 @@ if (!all.some(function (r) { return r.id === active; })) active = '00-route';
 
 var key = 'command-marketing-library-html';
 var saved = {};
-var baseTitle = '커맨드 마케팅 QR 라이브러리 | 32개 AI 마케팅 Agent 실습 부록';
+var baseTitle = '커맨드 마케팅 QR 라이브러리 | ' + db.total + '개 AI 마케팅 Agent 실습 부록';
 try { saved = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
 
 var SCENARIOS = [
-  { id: '03-voc', label: '오늘 VOC' },
+  { id: '00-brief6', label: '6칸 브리프' },
   { id: '02-rgctor', label: 'R-G-C-T-O-R' },
+  { id: '03-voc', label: '오늘 VOC' },
   { id: '04-calendar', label: '콘텐츠 캘린더' },
   { id: '05-adtest', label: '광고 실험' },
-  { id: '05-crm', label: 'CRM' },
   { id: '05-report', label: '주간 리포트' }
 ];
 
@@ -202,34 +203,36 @@ function render() {
   var nid = nextRelatedId(r.related, saved, null);
   var nItem = nid && findById(nid);
 
+  var practice = r.bookPractice || r.outcome;
   document.getElementById('content').innerHTML =
     '<article class="hero"><div class="hero-copy"><div class="eyebrow"><b>' + esc(r.part) + '</b><span>' +
-    esc(r.chapter) + '</span></div><h1>' + esc(r.title) + '</h1><p>' + esc(r.outcome) + '</p></div>' +
+    esc(r.chapter) + '</span></div><h1>' + esc(r.title) + '</h1><p>' + esc(r.outcome) + '</p>' +
+    '<p class="book-practice"><strong>책 단계별 실습</strong> ' + esc(practice) + '</p></div>' +
     '<div class="meta" aria-label="자료 정보"><div><span>예상 시간</span><strong>' + esc(r.time) +
     '</strong></div><div><span>제공 형식</span><strong>' + esc(r.format) +
     '</strong></div><div><span>저장 방식</span><strong>자동 저장</strong></div></div></article>' +
     '<div class="grid"><div class="main">' +
-    '<section class="panel">' + title('01', '이렇게 완성합니다', '책의 개념을 실제 업무 산출물로 바꾸는 순서입니다.') +
+    '<section class="panel">' + title('01', '책 실습 따라하기', '본문 「단계별 실습 과제」와 같은 순서입니다. 채운 뒤 역할·목표·맥락 지시문으로 실행합니다.') +
     '<ol class="steps">' + r.steps.map(function (x, i) {
       return '<li><b>0' + (i + 1) + '</b><span>' + esc(x) + '</span></li>';
     }).join('') + '</ol>' + relatedHtml(r) + '</section>' +
-    '<section class="panel">' + title('02', '내 업무로 작성하기', '확인 가능한 사실과 기준부터 적으세요.') +
+    '<section class="panel">' + title('02', '실습 빈칸 채우기', '책에서 적은 ①②③④를 그대로 옮기거나, 예시로 먼저 연습하세요.') +
     '<div class="field-toolbar">' +
     '<button type="button" class="action" id="fill-examples"' + (hasExamples ? '' : ' disabled') + '>예시 채우기</button>' +
     '<button type="button" class="action" id="overwrite-examples"' + (hasExamples ? '' : ' disabled') + '>예시로 덮어쓰기</button>' +
     '<button type="button" class="action" id="clear-values">작성 초기화</button>' +
-    '<span class="field-hint">예시는 가상 B2B SaaS 「플로우보드」 시나리오입니다. 빈 칸만 채우거나, 덮어쓰기로 전체를 교체할 수 있습니다.</span>' +
+    '<span class="field-hint">예시는 가상 B2B SaaS 「플로우보드」 시나리오입니다. 본문 실습과 같은 칸을 채운 뒤 AI에 붙여 넣으세요.</span>' +
     '</div><div class="fields">' + fields + '</div></section>' +
-    '<section class="panel">' + title('03', 'Agent에게 실행 요청하기', '작성한 내용이 합쳐진 완성 지시문을 복사해 붙여 넣으세요.') +
+    '<section class="panel">' + title('03', '본문과 같은 방식으로 Agent에게 실행', '역할 / 목표 / 맥락 / 출력 / 검수 기준으로 합성된 지시문을 복사해 붙여 넣으세요.') +
     '<div class="prompt"><div class="prompt-actions">' +
     '<button type="button" id="copy-composed" class="prompt-btn primary">완성본 복사</button>' +
     '<button type="button" id="copy-template" class="prompt-btn">템플릿만</button>' +
     '</div>' +
     (emptyN ? '<p class="warn">' + emptyN + '개 칸이 비어 있음 · 그래도 복사 가능</p>' : '') +
-    '<details class="preview" open><summary>완성 지시문 미리보기</summary><pre id="preview-composed">' +
+    '<details class="preview" open><summary>역할·목표·맥락 지시문 미리보기</summary><pre id="preview-composed">' +
     esc(composed) + '</pre></details></div>' +
-    '<div class="note">고객·직원·계정 정보는 제거하거나 익명화한 뒤 입력하세요.</div></section>' +
-    '</div><aside class="side"><section class="panel">' + title('04', '최종 검수', '세 항목을 모두 확인하면 완료할 수 있습니다.') +
+    '<div class="note">고객·직원·계정 정보는 제거하거나 익명화한 뒤 입력하세요. 책의 「프롬프트 예시」와 같은 형식으로 복사됩니다.</div></section>' +
+    '</div><aside class="side"><section class="panel">' + title('04', '책 핵심 포인트 검수', '본문 완료 체크와 맞춰 확인하면 실습을 완료할 수 있습니다.') +
     '<div class="checks">' + checks + '</div>' +
     '<button type="button" class="action" id="download">작성본 내려받기</button>' +
     '<button type="button" class="action primary ' + (st.complete ? 'done' : '') + '" id="complete" ' +
@@ -237,7 +240,8 @@ function render() {
     (nItem ? '<button type="button" class="action" id="next-card">다음 추천 · ' + esc(nItem.title) + '</button>' : '') +
     '<p class="help">완료 전에도 Markdown 파일로 내려받을 수 있습니다.</p></section>' +
     '<section class="book"><div class="book-icon" aria-hidden="true">CM</div><div><span>책에서 다시 보기</span><strong>' +
-    esc(r.part) + '</strong><p>' + esc(r.chapter) + '</p></div></section></aside></div>';
+    esc(r.part) + '</strong><p>' + esc(r.chapter) + '</p><p class="book-practice-side">' + esc(practice) +
+    '</p></div></section></aside></div>';
 
   document.querySelectorAll('textarea[data-field]').forEach(function (t) {
     t.oninput = function () {
@@ -281,7 +285,7 @@ function render() {
   };
   document.getElementById('copy-template').onclick = function () {
     var btn = this;
-    navigator.clipboard.writeText(r.prompt).then(function () {
+    navigator.clipboard.writeText(buildTemplatePrompt(r)).then(function () {
       flashCopy(btn);
     });
   };

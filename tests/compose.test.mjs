@@ -4,6 +4,7 @@ import {
   emptyFieldCount,
   applyPlaceholders,
   buildComposedPrompt,
+  buildTemplatePrompt,
   applyExamples,
   nextRelatedId
 } from '../js/compose.js';
@@ -34,35 +35,60 @@ describe('applyPlaceholders', () => {
 });
 
 describe('buildComposedPrompt', () => {
-  it('includes header, inputs, prompt, checks', () => {
+  it('emits book-style role/goal/context blocks', () => {
     const resource = {
-      title: '테스트',
-      part: 'Part 1',
-      chapter: 'Ch.01',
-      outcome: '결과',
-      fields: [{ label: '현재 역할' }],
-      prompt: '지시문',
-      checks: ['검수1']
+      title: 'VOC 분석',
+      part: 'Part 4',
+      chapter: 'Ch.02',
+      outcome: '6렌즈 분류',
+      bookPractice: 'VOC에서 카피 소재를 뽑는다',
+      fields: [{ label: 'VOC 원문' }],
+      agent: {
+        role: '당신은 고객 인사이트 Agent예요.',
+        goal: '6가지 렌즈로 분류해 주세요.',
+        output: '렌즈별 표',
+        review: '추정 금지'
+      },
+      prompt: '',
+      checks: ['6가지 렌즈 분류 결과']
     };
     const text = buildComposedPrompt(resource, {
-      values: { '현재 역할': '1인 마케터' },
+      values: { 'VOC 원문': '도입이 복잡할까 봐' },
       checked: [true]
     });
-    assert.match(text, /\[실습\] 테스트/);
-    assert.match(text, /## 내 입력/);
-    assert.match(text, /1인 마케터/);
-    assert.match(text, /## 실행 지시/);
-    assert.match(text, /## 검수 기준/);
-    assert.match(text, /- 검수1/);
+    assert.match(text, /\[책 실습\] VOC 분석/);
+    assert.match(text, /\[실습 목표\] VOC에서 카피 소재를 뽑는다/);
+    assert.match(text, /• 역할 : 당신은 고객 인사이트 Agent예요\./);
+    assert.match(text, /• 목표 :/);
+    assert.match(text, /• 맥락 :/);
+    assert.match(text, /도입이 복잡할까 봐/);
+    assert.match(text, /• 출력 :/);
+    assert.match(text, /• 검수 기준 :/);
+    assert.match(text, /6가지 렌즈 분류 결과 \(확인됨\)/);
   });
 
   it('shows [작성 필요] for empty fields', () => {
     const resource = {
       title: 'T', part: 'P', chapter: 'C', outcome: 'O',
-      fields: [{ label: 'X' }], prompt: 'p', checks: []
+      fields: [{ label: 'X' }],
+      agent: { role: 'R', goal: 'G', output: 'O', review: 'V' },
+      prompt: 'p', checks: []
     };
     const text = buildComposedPrompt(resource, { values: {}, checked: [] });
     assert.match(text, /\[작성 필요\]/);
+  });
+});
+
+describe('buildTemplatePrompt', () => {
+  it('keeps placeholders instead of values', () => {
+    const text = buildTemplatePrompt({
+      fields: [{ label: '목표', placeholder: '예: 전환' }],
+      agent: { role: '역할', goal: '목표', output: '출력', review: '검수' },
+      prompt: ''
+    });
+    assert.match(text, /• 역할 : 역할/);
+    assert.match(text, /【목표】/);
+    assert.match(text, /예: 전환/);
   });
 });
 
